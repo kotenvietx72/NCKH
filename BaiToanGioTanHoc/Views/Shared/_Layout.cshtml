@@ -37,7 +37,10 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="@Url.Action("Index", "MonHocs")">Quản Lý Môn Học</a></li>
-                            <li><a class="dropdown-item" href="@Url.Action("Index", "GiangViens")">Quản Lý Giảng Viên</a></li>
+                            @if (User.IsInRole("Administrator"))
+                            {
+                                <li><a class="dropdown-item" href="@Url.Action("Index", "GiangViens")">Quản Lý Giảng Viên</a></li>
+                            }
                             <li><a class="dropdown-item" href="@Url.Action("Index", "LopDanhNghias")">Quản Lý Lớp Danh Nghĩa</a></li>
                             <li><a class="dropdown-item" href="@Url.Action("Index", "PhongHocs")">Quản Lý Phòng Học</a></li>
                             <li><a class="dropdown-item" href="@Url.Action("Index", "LopHocPhans")">Quản Lý Lớp Học Phần</a></li>
@@ -52,7 +55,7 @@
                             <a class="nav-link text-white" href="@Url.Action("UploadExcel", "Excel")">Cập Nhật Dữ Liệu</a>
                         </li>
                     }
-                    </ul>
+                </ul>
                 <ul class="navbar-nav navbar-right">
                     @Html.Partial("_LoginPartial")
                 </ul>

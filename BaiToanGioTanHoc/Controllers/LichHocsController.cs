@@ -2,29 +2,44 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using BaiToanGioTanHoc.Models;
+using ChuongTrinhChinh;
 
 namespace BaiToanGioTanHoc.Controllers
 {
     [Authorize]
     public class LichHocsController : Controller
     {
-        private Entities1 db = new Entities1();
+        private Entities2 db = new Entities2();
 
         // GET: LichHocs
-        [AllowAnonymous]
-        public ActionResult Index()
+        public ActionResult Index(DateTime? searchDate)
         {
             var lichHocs = db.LichHocs.Include(l => l.LopHocPhan).Include(l => l.PhongHoc);
+
+            if (searchDate.HasValue)
+                lichHocs = lichHocs.Where(l => l.NgayHoc == searchDate.Value);
+
+            //GenerateDismissalTime(searchDate, 6);
+            //GenerateDismissalTime(searchDate, 12);
+
             return View(lichHocs.ToList());
         }
+        //public ActionResult Index()
+        //{
+        //    GenerateDismissalTime();
+        //    var lichHocs = db.LichHocs.Include(l => l.LopHocPhan).Include(l => l.PhongHoc);
+        //    return View(lichHocs.ToList());
+        //}
 
         // GET: LichHocs/Details/5
-        [AllowAnonymous]
+        
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -141,5 +156,7 @@ namespace BaiToanGioTanHoc.Controllers
             }
             base.Dispose(disposing);
         }
+
+        
     }
 }

@@ -12,7 +12,7 @@ namespace BaiToanGioTanHoc.Controllers
 {
     public class AspNetRolesController : Controller
     {
-        private Entities1 db = new Entities1();
+        private Entities2 db = new Entities2();
 
         // GET: AspNetRoles
         public ActionResult Index()

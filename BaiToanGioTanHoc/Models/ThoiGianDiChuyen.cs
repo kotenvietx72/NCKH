@@ -12,9 +12,12 @@ namespace BaiToanGioTanHoc.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class AspNetRole
+    public partial class ThoiGianDiChuyen
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
+        public string ToaNha { get; set; }
+        public Nullable<double> Time_Stair_1Floor { get; set; }
+        public Nullable<double> Time_Elavator_1Floor { get; set; }
+        public Nullable<double> Time_Stair_To_Parking { get; set; }
+        public Nullable<double> Time_Parking_To_Gate { get; set; }
     }
 }

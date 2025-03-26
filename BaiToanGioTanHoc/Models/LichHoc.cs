@@ -12,6 +12,9 @@ namespace BaiToanGioTanHoc.Models
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.Linq;
+    using BaiToanGioTanHoc.Controllers;
+    using static System.Collections.Specialized.BitVector32;
 
     public partial class LichHoc
     {
@@ -25,6 +28,7 @@ namespace BaiToanGioTanHoc.Models
         public int MaPhong { get; set; }
         [Required]
         [Display(Name = "Ngày Học")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public System.DateTime NgayHoc { get; set; }
         [Required]
         [Display(Name = "Tiết Bắt Đầu")]
@@ -32,10 +36,156 @@ namespace BaiToanGioTanHoc.Models
         [Required]
         [Display(Name = "Tiết Kết Thúc")]
         public int TietKetThuc { get; set; }
+        public bool Check {  get; set; }
         [Display(Name = "Giờ Tan Học")]
         public Nullable<System.TimeSpan> GioTanHoc { get; set; }
-
         public virtual LopHocPhan LopHocPhan { get; set; }
         public virtual PhongHoc PhongHoc { get; set; }
+
+        private Entities2 db;
+
+        public LichHoc() { }
+
+        public LichHoc DeepCopy()
+        {
+            return new LichHoc(db)
+            {
+                MaLichHoc = this.MaLichHoc,
+                MaLHP = this.MaLHP,
+                MaPhong = this.MaPhong,
+                NgayHoc = this.NgayHoc,
+                TietBatDau = this.TietBatDau,
+                TietKetThuc = this.TietKetThuc,
+                GioTanHoc = this.GioTanHoc,
+                Check = this.Check,
+                LopHocPhan = this.LopHocPhan,
+                PhongHoc = this.PhongHoc,
+            };
+        }
+        // Constructor nhận DbContext từ bên ngoài
+        public LichHoc(Entities2 db) => this.db = db;
+
+        public void InjectDbContext(Entities2 db) => this.db = db;
+
+        public ThoiGianDiChuyen GetThoiGianDiChuyenHA8() => db.ThoiGianDiChuyens.FirstOrDefault(t => t.ToaNha == "HA8");
+
+        public ThoiGianDiChuyen GetThoiGianDiChuyenHA9() => db.ThoiGianDiChuyens.FirstOrDefault(t => t.ToaNha == "HA9");
+
+        public ThoiGianDiChuyen GetThoiGianDiChuyenHA10() => db.ThoiGianDiChuyens.FirstOrDefault(t => t.ToaNha == "HA10");
+
+        public int GetSoCong() => (db.CongSoatVes.FirstOrDefault()).SoCong;
+
+        public double? GetThoiGianXuLiSV() => (db.CongSoatVes.FirstOrDefault()).ThoiGianXuLi1SV;
+
+        /// <summary>
+        /// Hàm tính thời gian đi từ lớp tới cổng soát vé 
+        /// </summary>
+        // Done
+        public double? TimeToGate()
+        {
+            if (PhongHoc.TenPhong.Substring(2, 2) == "A8")
+            {
+                int SoTang = int.Parse(PhongHoc.TenPhong.Substring(5, 1));
+                int Index = int.Parse(PhongHoc.TenPhong.Substring(6, 2)) switch
+                {
+                    01 or 02 or 10 => 0,
+                    03 or 04 or 08 or 09 => 1,
+                    05 or 06 or 07 => 2,
+                    _ => 0
+                };
+                return 60 + 5 * Index + (SoTang - 1) * GetThoiGianDiChuyenHA8().Time_Stair_1Floor + GetThoiGianDiChuyenHA8().Time_Stair_To_Parking + GetThoiGianDiChuyenHA8().Time_Parking_To_Gate;
+            }
+            else if (PhongHoc.TenPhong.Substring(2, 2) == "A9")
+            {
+                int SoTang = int.Parse(PhongHoc.TenPhong.Substring(5, 1));
+                if (int.Parse(PhongHoc.TenPhong.Substring(5, 1)) < 4)
+                {
+                    int Index = int.Parse(PhongHoc.TenPhong.Substring(6, 2)) switch
+                    {
+                        01 or 02 or 07 or 08 => 0,
+                        03 or 04 or 05 or 06 => 1,
+                        _ => 0
+                    };
+                    return 60 + 5 * Index + (SoTang - 1) * GetThoiGianDiChuyenHA9().Time_Stair_1Floor + GetThoiGianDiChuyenHA9().Time_Stair_To_Parking + GetThoiGianDiChuyenHA9().Time_Parking_To_Gate;
+                }
+                else
+                {
+                    if (PhongHoc.TenPhong.Length == 8)
+                    {
+                        int Index = int.Parse(PhongHoc.TenPhong.Substring(6, 2)) switch
+                        {
+                            01 or 02 or 09 => 0,
+                            03 or 04 or 07 => 1,
+                            05 or 06 or 08 => 2,
+                            _ => 0
+                        };
+                        return 60 + 5 * Index + (SoTang - 1) * GetThoiGianDiChuyenHA9().Time_Stair_1Floor + GetThoiGianDiChuyenHA9().Time_Stair_To_Parking + GetThoiGianDiChuyenHA9().Time_Parking_To_Gate;
+                    }
+                    else
+                    {
+                        int Index = int.Parse(PhongHoc.TenPhong.Substring(7, 2)) switch
+                        {
+                            12 => 0,
+                            10 => 1,
+                            _ => 0
+                        };
+                        return 60 + 5 * Index + (SoTang - 1) * GetThoiGianDiChuyenHA9().Time_Stair_1Floor + GetThoiGianDiChuyenHA9().Time_Stair_To_Parking + GetThoiGianDiChuyenHA9().Time_Parking_To_Gate;
+                    }
+                }
+            }
+            else if (PhongHoc.TenPhong.Substring(2, 3) == "A10")
+            {
+                if (PhongHoc.TenPhong.Length == 10)
+                {
+                    int SoTang = int.Parse(PhongHoc.TenPhong.Substring(6, 2));
+                    int Index = int.Parse(PhongHoc.TenPhong.Substring(8, 2)) switch
+                    {
+                        05 or 06 or 07 => 0,
+                        03 or 04 or 08 or 09 => 1,
+                        01 or 02 or 10 or 11 => 2,
+                        _ => 0
+                    };
+                    return 60 + 180 + 5 * Index + (SoTang - 1) * GetThoiGianDiChuyenHA10().Time_Elavator_1Floor + GetThoiGianDiChuyenHA10().Time_Stair_To_Parking + GetThoiGianDiChuyenHA10().Time_Parking_To_Gate;
+                }
+                else if (PhongHoc.TenPhong.Length == 9 && int.Parse(PhongHoc.TenPhong.Substring(6, 1)) > 6)
+                {
+                    int SoTang = int.Parse(PhongHoc.TenPhong.Substring(6, 1));
+                    int Index = int.Parse(PhongHoc.TenPhong.Substring(7, 2)) switch
+                    {
+                        05 or 06 or 07 => 0,
+                        03 or 04 or 08 or 09 => 1,
+                        01 or 02 or 10 or 11 => 2,
+                        _ => 0
+                    };
+                    return 60 + 180 + 5 * Index + (SoTang - 1) * GetThoiGianDiChuyenHA10().Time_Elavator_1Floor + GetThoiGianDiChuyenHA10().Time_Stair_To_Parking + GetThoiGianDiChuyenHA10().Time_Parking_To_Gate;
+                }
+                else
+                {
+                    int SoTang = int.Parse(PhongHoc.TenPhong.Substring(6, 1));
+                    int Index = int.Parse(PhongHoc.TenPhong.Substring(7, 2)) switch
+                    {
+                        01 or 02 or 05 or 06 or 07 => 0,
+                        03 or 04 or 08 or 09 => 1,
+                        10 or 11 => 2,
+                        _ => 0
+                    };
+                    return 60 + 5 * Index + (SoTang - 1) * GetThoiGianDiChuyenHA10().Time_Stair_1Floor + GetThoiGianDiChuyenHA10().Time_Stair_To_Parking + GetThoiGianDiChuyenHA10().Time_Parking_To_Gate;
+                }
+            }
+            else { return 0; }
+        }
+
+        /// <summary>
+        /// Hàm tính thời gian 1 lớp đi ra hết khỏi cổng soát vé 
+        /// </summary>
+        // Done
+        public double? ExitTime() => LopHocPhan.SiSo * GetThoiGianXuLiSV() / GetSoCong() * 0.85;
+
+        /// <summary>
+        /// Hàm lấy số tiết học của 1 lớp 
+        /// </summary>
+        // Done
+        public int GetSessionCount() => TietKetThuc - TietBatDau + 1;
+
     }
 }

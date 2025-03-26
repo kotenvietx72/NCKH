@@ -5,20 +5,22 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
       <Schema Namespace="Model.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="nvarchar" MaxLength="150" Nullable="false" />
+          <Property Name="ContextKey" Type="nvarchar" MaxLength="300" Nullable="false" />
+          <Property Name="Model" Type="varbinary(max)" Nullable="false" />
+          <Property Name="ProductVersion" Type="nvarchar" MaxLength="32" Nullable="false" />
+        </EntityType>
         <EntityType Name="AspNetRoles">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="256" Nullable="false" />
-        </EntityType>
-        <EntityType Name="AspNetUserRoles">
-          <Key>
-            <PropertyRef Name="UserId" />
-            <PropertyRef Name="RoleId" />
-          </Key>
-          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
-          <Property Name="RoleId" Type="nvarchar" MaxLength="128" Nullable="false" />
         </EntityType>
         <EntityType Name="AspNetUsers">
           <Key>
@@ -36,6 +38,13 @@
           <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
+        </EntityType>
+        <EntityType Name="CongSoatVe">
+          <Key>
+            <PropertyRef Name="SoCong" />
+          </Key>
+          <Property Name="SoCong" Type="int" Nullable="false" />
+          <Property Name="ThoiGianXuLi1SV" Type="float" />
         </EntityType>
         <EntityType Name="GiangVien">
           <Key>
@@ -88,7 +97,17 @@
           <Property Name="TenPhong" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="DayNha" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
-        <Association Name="FK__LichHoc__MaLHP__6C190EBB">
+        <EntityType Name="ThoiGianDiChuyen">
+          <Key>
+            <PropertyRef Name="ToaNha" />
+          </Key>
+          <Property Name="ToaNha" Type="nchar" MaxLength="5" Nullable="false" />
+          <Property Name="Time_Stair_1Floor" Type="float" />
+          <Property Name="Time_Elavator_1Floor" Type="float" />
+          <Property Name="Time_Stair_To_Parking" Type="float" />
+          <Property Name="Time_Parking_To_Gate" Type="float" />
+        </EntityType>
+        <Association Name="FK__LichHoc__MaLHP__70DDC3D8">
           <End Role="LopHocPhan" Type="Self.LopHocPhan" Multiplicity="1" />
           <End Role="LichHoc" Type="Self.LichHoc" Multiplicity="*" />
           <ReferentialConstraint>
@@ -100,7 +119,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__LichHoc__MaPhong__6D0D32F4">
+        <Association Name="FK__LichHoc__MaPhong__71D1E811">
           <End Role="PhongHoc" Type="Self.PhongHoc" Multiplicity="1" />
           <End Role="LichHoc" Type="Self.LichHoc" Multiplicity="*" />
           <ReferentialConstraint>
@@ -112,7 +131,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__LopHocPha__MaGia__6754599E">
+        <Association Name="FK__LopHocPha__MaGia__6A30C649">
           <End Role="GiangVien" Type="Self.GiangVien" Multiplicity="1" />
           <End Role="LopHocPhan" Type="Self.LopHocPhan" Multiplicity="*" />
           <ReferentialConstraint>
@@ -124,7 +143,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__LopHocPha__MaLop__66603565">
+        <Association Name="FK__LopHocPha__MaLop__693CA210">
           <End Role="LopDanhNghia" Type="Self.LopDanhNghia" Multiplicity="1" />
           <End Role="LopHocPhan" Type="Self.LopHocPhan" Multiplicity="*" />
           <ReferentialConstraint>
@@ -136,7 +155,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__LopHocPhan__MaMH__656C112C">
+        <Association Name="FK__LopHocPhan__MaMH__68487DD7">
           <End Role="MonHoc" Type="Self.MonHoc" Multiplicity="1" />
           <End Role="LopHocPhan" Type="Self.LopHocPhan" Multiplicity="*" />
           <ReferentialConstraint>
@@ -148,71 +167,37 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId">
-          <End Role="AspNetRoles" Type="Self.AspNetRoles" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetRoles">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserRoles">
-              <PropertyRef Name="RoleId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
-          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="AspNetUserRoles" Type="Self.AspNetUserRoles" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="AspNetUsers">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="AspNetUserRoles">
-              <PropertyRef Name="UserId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="ModelStoreContainer">
+          <EntitySet Name="__MigrationHistory" EntityType="Self.__MigrationHistory" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRoles" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="AspNetUserRoles" EntityType="Self.AspNetUserRoles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CongSoatVe" EntityType="Self.CongSoatVe" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="GiangVien" EntityType="Self.GiangVien" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LichHoc" EntityType="Self.LichHoc" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LopDanhNghia" EntityType="Self.LopDanhNghia" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="LopHocPhan" EntityType="Self.LopHocPhan" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="MonHoc" EntityType="Self.MonHoc" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PhongHoc" EntityType="Self.PhongHoc" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__LichHoc__MaLHP__6C190EBB" Association="Self.FK__LichHoc__MaLHP__6C190EBB">
+          <EntitySet Name="ThoiGianDiChuyen" EntityType="Self.ThoiGianDiChuyen" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__LichHoc__MaLHP__70DDC3D8" Association="Self.FK__LichHoc__MaLHP__70DDC3D8">
             <End Role="LopHocPhan" EntitySet="LopHocPhan" />
             <End Role="LichHoc" EntitySet="LichHoc" />
           </AssociationSet>
-          <AssociationSet Name="FK__LichHoc__MaPhong__6D0D32F4" Association="Self.FK__LichHoc__MaPhong__6D0D32F4">
+          <AssociationSet Name="FK__LichHoc__MaPhong__71D1E811" Association="Self.FK__LichHoc__MaPhong__71D1E811">
             <End Role="PhongHoc" EntitySet="PhongHoc" />
             <End Role="LichHoc" EntitySet="LichHoc" />
           </AssociationSet>
-          <AssociationSet Name="FK__LopHocPha__MaGia__6754599E" Association="Self.FK__LopHocPha__MaGia__6754599E">
+          <AssociationSet Name="FK__LopHocPha__MaGia__6A30C649" Association="Self.FK__LopHocPha__MaGia__6A30C649">
             <End Role="GiangVien" EntitySet="GiangVien" />
             <End Role="LopHocPhan" EntitySet="LopHocPhan" />
           </AssociationSet>
-          <AssociationSet Name="FK__LopHocPha__MaLop__66603565" Association="Self.FK__LopHocPha__MaLop__66603565">
+          <AssociationSet Name="FK__LopHocPha__MaLop__693CA210" Association="Self.FK__LopHocPha__MaLop__693CA210">
             <End Role="LopDanhNghia" EntitySet="LopDanhNghia" />
             <End Role="LopHocPhan" EntitySet="LopHocPhan" />
           </AssociationSet>
-          <AssociationSet Name="FK__LopHocPhan__MaMH__656C112C" Association="Self.FK__LopHocPhan__MaMH__656C112C">
+          <AssociationSet Name="FK__LopHocPhan__MaMH__68487DD7" Association="Self.FK__LopHocPhan__MaMH__68487DD7">
             <End Role="MonHoc" EntitySet="MonHoc" />
             <End Role="LopHocPhan" EntitySet="LopHocPhan" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetRoles_RoleId">
-            <End Role="AspNetRoles" EntitySet="AspNetRoles" />
-            <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
-          </AssociationSet>
-          <AssociationSet Name="FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId" Association="Self.FK_dbo_AspNetUserRoles_dbo_AspNetUsers_UserId">
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
-            <End Role="AspNetUserRoles" EntitySet="AspNetUserRoles" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -220,13 +205,22 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="Model" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="C__MigrationHistory">
+          <Key>
+            <PropertyRef Name="MigrationId" />
+            <PropertyRef Name="ContextKey" />
+          </Key>
+          <Property Name="MigrationId" Type="String" MaxLength="150" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ContextKey" Type="String" MaxLength="300" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Model" Type="Binary" MaxLength="Max" FixedLength="false" Nullable="false" />
+          <Property Name="ProductVersion" Type="String" MaxLength="32" FixedLength="false" Unicode="true" Nullable="false" />
+        </EntityType>
         <EntityType Name="AspNetRole">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="AspNetUsers" Relationship="Self.AspNetUserRoles" FromRole="AspNetRoles" ToRole="AspNetUsers" />
         </EntityType>
         <EntityType Name="AspNetUser">
           <Key>
@@ -244,7 +238,13 @@
           <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
           <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
           <Property Name="UserName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="AspNetRoles" Relationship="Self.AspNetUserRoles" FromRole="AspNetUsers" ToRole="AspNetRoles" />
+        </EntityType>
+        <EntityType Name="CongSoatVe">
+          <Key>
+            <PropertyRef Name="SoCong" />
+          </Key>
+          <Property Name="SoCong" Type="Int32" Nullable="false" />
+          <Property Name="ThoiGianXuLi1SV" Type="Double" />
         </EntityType>
         <EntityType Name="GiangVien">
           <Key>
@@ -252,7 +252,7 @@
           </Key>
           <Property Name="MaGiangVien" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="HoTenGiangVien" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="LopHocPhans" Relationship="Self.FK__LopHocPha__MaGia__6754599E" FromRole="GiangVien" ToRole="LopHocPhan" />
+          <NavigationProperty Name="LopHocPhans" Relationship="Self.FK__LopHocPha__MaGia__6A30C649" FromRole="GiangVien" ToRole="LopHocPhan" />
         </EntityType>
         <EntityType Name="LichHoc">
           <Key>
@@ -265,8 +265,8 @@
           <Property Name="TietBatDau" Type="Int32" Nullable="false" />
           <Property Name="TietKetThuc" Type="Int32" Nullable="false" />
           <Property Name="GioTanHoc" Type="Time" Precision="7" />
-          <NavigationProperty Name="LopHocPhan" Relationship="Self.FK__LichHoc__MaLHP__6C190EBB" FromRole="LichHoc" ToRole="LopHocPhan" />
-          <NavigationProperty Name="PhongHoc" Relationship="Self.FK__LichHoc__MaPhong__6D0D32F4" FromRole="LichHoc" ToRole="PhongHoc" />
+          <NavigationProperty Name="LopHocPhan" Relationship="Self.FK__LichHoc__MaLHP__70DDC3D8" FromRole="LichHoc" ToRole="LopHocPhan" />
+          <NavigationProperty Name="PhongHoc" Relationship="Self.FK__LichHoc__MaPhong__71D1E811" FromRole="LichHoc" ToRole="PhongHoc" />
         </EntityType>
         <EntityType Name="LopDanhNghia">
           <Key>
@@ -274,7 +274,7 @@
           </Key>
           <Property Name="MaLopDN" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TenLopDN" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="LopHocPhans" Relationship="Self.FK__LopHocPha__MaLop__66603565" FromRole="LopDanhNghia" ToRole="LopHocPhan" />
+          <NavigationProperty Name="LopHocPhans" Relationship="Self.FK__LopHocPha__MaLop__693CA210" FromRole="LopDanhNghia" ToRole="LopHocPhan" />
         </EntityType>
         <EntityType Name="LopHocPhan">
           <Key>
@@ -285,10 +285,10 @@
           <Property Name="MaLopDN" Type="Int32" Nullable="false" />
           <Property Name="SiSo" Type="Int32" />
           <Property Name="MaGiangVien" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="GiangVien" Relationship="Self.FK__LopHocPha__MaGia__6754599E" FromRole="LopHocPhan" ToRole="GiangVien" />
-          <NavigationProperty Name="LichHocs" Relationship="Self.FK__LichHoc__MaLHP__6C190EBB" FromRole="LopHocPhan" ToRole="LichHoc" />
-          <NavigationProperty Name="LopDanhNghia" Relationship="Self.FK__LopHocPha__MaLop__66603565" FromRole="LopHocPhan" ToRole="LopDanhNghia" />
-          <NavigationProperty Name="MonHoc" Relationship="Self.FK__LopHocPhan__MaMH__656C112C" FromRole="LopHocPhan" ToRole="MonHoc" />
+          <NavigationProperty Name="GiangVien" Relationship="Self.FK__LopHocPha__MaGia__6A30C649" FromRole="LopHocPhan" ToRole="GiangVien" />
+          <NavigationProperty Name="LichHocs" Relationship="Self.FK__LichHoc__MaLHP__70DDC3D8" FromRole="LopHocPhan" ToRole="LichHoc" />
+          <NavigationProperty Name="LopDanhNghia" Relationship="Self.FK__LopHocPha__MaLop__693CA210" FromRole="LopHocPhan" ToRole="LopDanhNghia" />
+          <NavigationProperty Name="MonHoc" Relationship="Self.FK__LopHocPhan__MaMH__68487DD7" FromRole="LopHocPhan" ToRole="MonHoc" />
         </EntityType>
         <EntityType Name="MonHoc">
           <Key>
@@ -296,7 +296,7 @@
           </Key>
           <Property Name="MaMH" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TenMH" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="LopHocPhans" Relationship="Self.FK__LopHocPhan__MaMH__656C112C" FromRole="MonHoc" ToRole="LopHocPhan" />
+          <NavigationProperty Name="LopHocPhans" Relationship="Self.FK__LopHocPhan__MaMH__68487DD7" FromRole="MonHoc" ToRole="LopHocPhan" />
         </EntityType>
         <EntityType Name="PhongHoc">
           <Key>
@@ -305,9 +305,19 @@
           <Property Name="MaPhong" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="TenPhong" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="DayNha" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="LichHocs" Relationship="Self.FK__LichHoc__MaPhong__6D0D32F4" FromRole="PhongHoc" ToRole="LichHoc" />
+          <NavigationProperty Name="LichHocs" Relationship="Self.FK__LichHoc__MaPhong__71D1E811" FromRole="PhongHoc" ToRole="LichHoc" />
         </EntityType>
-        <Association Name="FK__LopHocPha__MaGia__6754599E">
+        <EntityType Name="ThoiGianDiChuyen">
+          <Key>
+            <PropertyRef Name="ToaNha" />
+          </Key>
+          <Property Name="ToaNha" Type="String" MaxLength="5" FixedLength="true" Unicode="true" Nullable="false" />
+          <Property Name="Time_Stair_1Floor" Type="Double" />
+          <Property Name="Time_Elavator_1Floor" Type="Double" />
+          <Property Name="Time_Stair_To_Parking" Type="Double" />
+          <Property Name="Time_Parking_To_Gate" Type="Double" />
+        </EntityType>
+        <Association Name="FK__LopHocPha__MaGia__6A30C649">
           <End Role="GiangVien" Type="Self.GiangVien" Multiplicity="1" />
           <End Role="LopHocPhan" Type="Self.LopHocPhan" Multiplicity="*" />
           <ReferentialConstraint>
@@ -319,7 +329,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__LichHoc__MaLHP__6C190EBB">
+        <Association Name="FK__LichHoc__MaLHP__70DDC3D8">
           <End Role="LopHocPhan" Type="Self.LopHocPhan" Multiplicity="1" />
           <End Role="LichHoc" Type="Self.LichHoc" Multiplicity="*" />
           <ReferentialConstraint>
@@ -331,7 +341,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__LichHoc__MaPhong__6D0D32F4">
+        <Association Name="FK__LichHoc__MaPhong__71D1E811">
           <End Role="PhongHoc" Type="Self.PhongHoc" Multiplicity="1" />
           <End Role="LichHoc" Type="Self.LichHoc" Multiplicity="*" />
           <ReferentialConstraint>
@@ -343,7 +353,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__LopHocPha__MaLop__66603565">
+        <Association Name="FK__LopHocPha__MaLop__693CA210">
           <End Role="LopDanhNghia" Type="Self.LopDanhNghia" Multiplicity="1" />
           <End Role="LopHocPhan" Type="Self.LopHocPhan" Multiplicity="*" />
           <ReferentialConstraint>
@@ -355,7 +365,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__LopHocPhan__MaMH__656C112C">
+        <Association Name="FK__LopHocPhan__MaMH__68487DD7">
           <End Role="MonHoc" Type="Self.MonHoc" Multiplicity="1" />
           <End Role="LopHocPhan" Type="Self.LopHocPhan" Multiplicity="*" />
           <ReferentialConstraint>
@@ -367,42 +377,37 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="AspNetUserRoles">
-          <End Role="AspNetRoles" Type="Self.AspNetRole" Multiplicity="*" />
-          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="*" />
-        </Association>
-        <EntityContainer Name="Entities1" annotation:LazyLoadingEnabled="true">
+        <EntityContainer Name="Entities2" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="C__MigrationHistory" EntityType="Self.C__MigrationHistory" />
           <EntitySet Name="AspNetRoles" EntityType="Self.AspNetRole" />
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUser" />
+          <EntitySet Name="CongSoatVes" EntityType="Self.CongSoatVe" />
           <EntitySet Name="GiangViens" EntityType="Self.GiangVien" />
           <EntitySet Name="LichHocs" EntityType="Self.LichHoc" />
           <EntitySet Name="LopDanhNghias" EntityType="Self.LopDanhNghia" />
           <EntitySet Name="LopHocPhans" EntityType="Self.LopHocPhan" />
           <EntitySet Name="MonHocs" EntityType="Self.MonHoc" />
           <EntitySet Name="PhongHocs" EntityType="Self.PhongHoc" />
-          <AssociationSet Name="FK__LopHocPha__MaGia__6754599E" Association="Self.FK__LopHocPha__MaGia__6754599E">
+          <EntitySet Name="ThoiGianDiChuyens" EntityType="Self.ThoiGianDiChuyen" />
+          <AssociationSet Name="FK__LopHocPha__MaGia__6A30C649" Association="Self.FK__LopHocPha__MaGia__6A30C649">
             <End Role="GiangVien" EntitySet="GiangViens" />
             <End Role="LopHocPhan" EntitySet="LopHocPhans" />
           </AssociationSet>
-          <AssociationSet Name="FK__LichHoc__MaLHP__6C190EBB" Association="Self.FK__LichHoc__MaLHP__6C190EBB">
+          <AssociationSet Name="FK__LichHoc__MaLHP__70DDC3D8" Association="Self.FK__LichHoc__MaLHP__70DDC3D8">
             <End Role="LopHocPhan" EntitySet="LopHocPhans" />
             <End Role="LichHoc" EntitySet="LichHocs" />
           </AssociationSet>
-          <AssociationSet Name="FK__LichHoc__MaPhong__6D0D32F4" Association="Self.FK__LichHoc__MaPhong__6D0D32F4">
+          <AssociationSet Name="FK__LichHoc__MaPhong__71D1E811" Association="Self.FK__LichHoc__MaPhong__71D1E811">
             <End Role="PhongHoc" EntitySet="PhongHocs" />
             <End Role="LichHoc" EntitySet="LichHocs" />
           </AssociationSet>
-          <AssociationSet Name="FK__LopHocPha__MaLop__66603565" Association="Self.FK__LopHocPha__MaLop__66603565">
+          <AssociationSet Name="FK__LopHocPha__MaLop__693CA210" Association="Self.FK__LopHocPha__MaLop__693CA210">
             <End Role="LopDanhNghia" EntitySet="LopDanhNghias" />
             <End Role="LopHocPhan" EntitySet="LopHocPhans" />
           </AssociationSet>
-          <AssociationSet Name="FK__LopHocPhan__MaMH__656C112C" Association="Self.FK__LopHocPhan__MaMH__656C112C">
+          <AssociationSet Name="FK__LopHocPhan__MaMH__68487DD7" Association="Self.FK__LopHocPhan__MaMH__68487DD7">
             <End Role="MonHoc" EntitySet="MonHocs" />
             <End Role="LopHocPhan" EntitySet="LopHocPhans" />
-          </AssociationSet>
-          <AssociationSet Name="AspNetUserRoles" Association="Self.AspNetUserRoles">
-            <End Role="AspNetRoles" EntitySet="AspNetRoles" />
-            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
           </AssociationSet>
         </EntityContainer>
       </Schema>
@@ -410,7 +415,17 @@
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="ModelStoreContainer" CdmEntityContainer="Entities1">
+        <EntityContainerMapping StorageEntityContainer="ModelStoreContainer" CdmEntityContainer="Entities2">
+          <EntitySetMapping Name="C__MigrationHistory">
+            <EntityTypeMapping TypeName="Model.C__MigrationHistory">
+              <MappingFragment StoreEntitySet="__MigrationHistory">
+                <ScalarProperty Name="MigrationId" ColumnName="MigrationId" />
+                <ScalarProperty Name="ContextKey" ColumnName="ContextKey" />
+                <ScalarProperty Name="Model" ColumnName="Model" />
+                <ScalarProperty Name="ProductVersion" ColumnName="ProductVersion" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="AspNetRoles">
             <EntityTypeMapping TypeName="Model.AspNetRole">
               <MappingFragment StoreEntitySet="AspNetRoles">
@@ -434,6 +449,14 @@
                 <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
                 <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
                 <ScalarProperty Name="UserName" ColumnName="UserName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CongSoatVes">
+            <EntityTypeMapping TypeName="Model.CongSoatVe">
+              <MappingFragment StoreEntitySet="CongSoatVe">
+                <ScalarProperty Name="SoCong" ColumnName="SoCong" />
+                <ScalarProperty Name="ThoiGianXuLi1SV" ColumnName="ThoiGianXuLi1SV" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -494,14 +517,17 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <AssociationSetMapping Name="AspNetUserRoles" TypeName="Model.AspNetUserRoles" StoreEntitySet="AspNetUserRoles">
-            <EndProperty Name="AspNetRoles">
-              <ScalarProperty Name="Id" ColumnName="RoleId" />
-            </EndProperty>
-            <EndProperty Name="AspNetUsers">
-              <ScalarProperty Name="Id" ColumnName="UserId" />
-            </EndProperty>
-          </AssociationSetMapping>
+          <EntitySetMapping Name="ThoiGianDiChuyens">
+            <EntityTypeMapping TypeName="Model.ThoiGianDiChuyen">
+              <MappingFragment StoreEntitySet="ThoiGianDiChuyen">
+                <ScalarProperty Name="ToaNha" ColumnName="ToaNha" />
+                <ScalarProperty Name="Time_Stair_1Floor" ColumnName="Time_Stair_1Floor" />
+                <ScalarProperty Name="Time_Elavator_1Floor" ColumnName="Time_Elavator_1Floor" />
+                <ScalarProperty Name="Time_Stair_To_Parking" ColumnName="Time_Stair_To_Parking" />
+                <ScalarProperty Name="Time_Parking_To_Gate" ColumnName="Time_Parking_To_Gate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

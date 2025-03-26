@@ -4,21 +4,23 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="0ca93eb7bb2d48a0aaac3ce76f3edded" Name="Diagram1">
-        <EntityTypeShape EntityType="Model.AspNetRole" Width="1.5" PointX="5.75" PointY="6" IsExpanded="true" />
-        <EntityTypeShape EntityType="Model.AspNetUser" Width="1.5" PointX="8" PointY="5" IsExpanded="true" />
+      <Diagram DiagramId="3906f681bafd479689e05631c68af93e" Name="Diagram1">
+        <EntityTypeShape EntityType="Model.C__MigrationHistory" Width="1.5" PointX="5.75" PointY="4.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.AspNetRole" Width="1.5" PointX="7.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.AspNetUser" Width="1.5" PointX="7.75" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="Model.CongSoatVe" Width="1.5" PointX="2.75" PointY="8.75" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.GiangVien" Width="1.5" PointX="0.75" PointY="1.5" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.LichHoc" Width="1.5" PointX="5.25" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.LopDanhNghia" Width="1.5" PointX="0.75" PointY="4.625" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.LopHocPhan" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.MonHoc" Width="1.5" PointX="0.75" PointY="7" IsExpanded="true" />
         <EntityTypeShape EntityType="Model.PhongHoc" Width="1.5" PointX="3" PointY="5.5" IsExpanded="true" />
-        <AssociationConnector Association="Model.FK__LopHocPha__MaGia__6754599E" ManuallyRouted="false" />
-        <AssociationConnector Association="Model.FK__LichHoc__MaLHP__6C190EBB" ManuallyRouted="false" />
-        <AssociationConnector Association="Model.FK__LichHoc__MaPhong__6D0D32F4" ManuallyRouted="false" />
-        <AssociationConnector Association="Model.FK__LopHocPha__MaLop__66603565" ManuallyRouted="false" />
-        <AssociationConnector Association="Model.FK__LopHocPhan__MaMH__656C112C" ManuallyRouted="false" />
-        <AssociationConnector Association="Model.AspNetUserRoles" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="Model.ThoiGianDiChuyen" Width="1.5" PointX="4.75" PointY="8.75" IsExpanded="true" />
+        <AssociationConnector Association="Model.FK__LopHocPha__MaGia__6A30C649" ManuallyRouted="false" />
+        <AssociationConnector Association="Model.FK__LichHoc__MaLHP__70DDC3D8" ManuallyRouted="false" />
+        <AssociationConnector Association="Model.FK__LichHoc__MaPhong__71D1E811" ManuallyRouted="false" />
+        <AssociationConnector Association="Model.FK__LopHocPha__MaLop__693CA210" ManuallyRouted="false" />
+        <AssociationConnector Association="Model.FK__LopHocPhan__MaMH__68487DD7" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

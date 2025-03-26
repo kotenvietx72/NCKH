@@ -13,17 +13,17 @@ namespace BaiToanGioTanHoc.Controllers
     [Authorize]
     public class PhongHocsController : Controller
     {
-        private Entities1 db = new Entities1();
+        private Entities2 db = new Entities2();
 
         // GET: PhongHocs
-        [AllowAnonymous]
+       
         public ActionResult Index()
         {
             return View(db.PhongHocs.ToList());
         }
 
         // GET: PhongHocs/Details/5
-        [AllowAnonymous]
+       
         public ActionResult Details(int? id)
         {
             if (id == null)

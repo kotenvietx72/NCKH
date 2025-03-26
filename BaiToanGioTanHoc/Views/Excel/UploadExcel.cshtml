@@ -1,19 +1,52 @@
 ﻿@{
     ViewBag.Title = "Upload Excel";
 }
-<h2>Upload Excel</h2>
 
-@if (TempData["SuccessMessage"] != null)
+<h2 class="text-center">Upload Excel</h2>
+
+<div class="container mt-4">
+    <div class="card shadow-sm p-4">
+        <form action="@Url.Action("UploadExcel", "Excel")" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input type="file" class="form-control w-200" name="file" required />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Upload</button>
+        </form>
+    </div>
+</div>
+
+<!-- Bootstrap Modal -->
+<div id="messageModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                }
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hiển thị modal nếu có thông báo -->
+@if (TempData["SuccessMessage"] != null || TempData["ErrorMessage"] != null)
 {
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var messageModal = new bootstrap.Modal(document.getElementById("messageModal"));
+            messageModal.show();
+        });
+    </script>
 }
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-}
-
-<form action="@Url.Action("UploadExcel", "Excel")" method="post" enctype="multipart/form-data">
-    <input type="file" name="file" required />
-    <button type="submit" class="btn btn-primary">Upload</button>
-</form>

@@ -12,9 +12,9 @@ namespace BaiToanGioTanHoc.Models
     using System;
     using System.Collections.Generic;
     
-    public partial class AspNetRole
+    public partial class CongSoatVe
     {
-        public string Id { get; set; }
-        public string Name { get; set; }
+        public int SoCong { get; set; }
+        public Nullable<double> ThoiGianXuLi1SV { get; set; }
     }
 }

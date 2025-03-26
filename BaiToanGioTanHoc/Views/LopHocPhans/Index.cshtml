@@ -12,8 +12,17 @@
         @Html.ActionLink("Create New", "Create")
     </p>
 }
+@using (Html.BeginForm("Index", "LopHocPhans", FormMethod.Get))
+{
+    <label>Nhập mã lớp học phần:</label>
+    <input type="text" name="searchMaLHP" class="form-control" value="@Request.QueryString["searchMaLHP"]" placeholder="Nhập mã lớp học phần" />
+    <button type="submit" class="btn btn-primary mt-2">Tìm kiếm</button>
+}
 <table class="table">
     <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.MaLHP)
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.SiSo)
         </th>
@@ -32,6 +41,9 @@
     @foreach (var item in Model)
     {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaLHP)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.SiSo)
             </td>

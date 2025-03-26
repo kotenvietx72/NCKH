@@ -13,10 +13,10 @@ namespace BaiToanGioTanHoc.Models
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class Entities1 : DbContext
+    public partial class Entities2 : DbContext
     {
-        public Entities1()
-            : base("name=Entities1")
+        public Entities2()
+            : base("name=Entities2")
         {
         }
     
@@ -25,13 +25,16 @@ namespace BaiToanGioTanHoc.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<C__MigrationHistory> C__MigrationHistory { get; set; }
         public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
         public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
+        public virtual DbSet<CongSoatVe> CongSoatVes { get; set; }
         public virtual DbSet<GiangVien> GiangViens { get; set; }
         public virtual DbSet<LichHoc> LichHocs { get; set; }
         public virtual DbSet<LopDanhNghia> LopDanhNghias { get; set; }
         public virtual DbSet<LopHocPhan> LopHocPhans { get; set; }
         public virtual DbSet<MonHoc> MonHocs { get; set; }
         public virtual DbSet<PhongHoc> PhongHocs { get; set; }
+        public virtual DbSet<ThoiGianDiChuyen> ThoiGianDiChuyens { get; set; }
     }
 }

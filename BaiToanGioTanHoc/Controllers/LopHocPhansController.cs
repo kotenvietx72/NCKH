@@ -13,18 +13,24 @@ namespace BaiToanGioTanHoc.Controllers
     [Authorize]
     public class LopHocPhansController : Controller
     {
-        private Entities1 db = new Entities1();
+        private Entities2 db = new Entities2();
 
         // GET: LopHocPhans
-        [AllowAnonymous]
-        public ActionResult Index()
+
+        public ActionResult Index(string searchMaLHP)
         {
             var lopHocPhans = db.LopHocPhans.Include(l => l.GiangVien).Include(l => l.LopDanhNghia).Include(l => l.MonHoc);
+
+            if (!string.IsNullOrEmpty(searchMaLHP))
+            {
+                lopHocPhans = lopHocPhans.Where(l => l.MaLHP.Contains(searchMaLHP));
+            }
+
             return View(lopHocPhans.ToList());
         }
 
         // GET: LopHocPhans/Details/5
-        [AllowAnonymous]
+
         public ActionResult Details(string id)
         {
             if (id == null)

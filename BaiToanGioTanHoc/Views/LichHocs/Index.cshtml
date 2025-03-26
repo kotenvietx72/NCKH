@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<BaiToanGioTanHoc.Models.LichHoc>
 
+
 @{
     ViewBag.Title = "Index";
 }
@@ -18,8 +19,17 @@
             @Html.ActionLink("Create New", "Create")
         </p>
     }
+    @using (Html.BeginForm("Index", "LichHocs", FormMethod.Get))
+    {
+        <label>Chọn ngày học:</label>
+        <input type="date" name="searchDate" class="form-control" value="@Request.QueryString["searchDate"]" />
+        <button type="submit" class="btn btn-primary mt-2">Tìm kiếm</button>
+    }
     <table class="table">
         <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MaLichHoc)
+            </th>
             <th>
                 @Html.DisplayNameFor(model => model.NgayHoc)
             </th>
@@ -44,6 +54,9 @@
         @foreach (var item in Model)
         {
             <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaLichHoc)
+                </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.NgayHoc)
                 </td>
