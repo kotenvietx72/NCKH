@@ -36,7 +36,6 @@ namespace ChuongTrinhChinh
         /// Sắp xếp lớp tăng dần theo thời gian ra khỏi cổng + thời gian xử lí           
         /// </summary>
         /// <param name="classRooms"></param>
-        // Done
         public void SapXep(List<LichHoc> classRooms)
         {
             classRooms = classRooms.OrderBy(c => c.TimeToGate() + c.ExitTime()).ToList();
@@ -47,7 +46,6 @@ namespace ChuongTrinhChinh
         /// </summary>
         /// <param name="batchScheduler"></param>
         /// <returns></returns>
-        // Done
         public int IsValidBatch(BatchScheduler batchScheduler)
         {
             int dem = 0;
@@ -65,7 +63,6 @@ namespace ChuongTrinhChinh
         /// </summary>
         /// <param name="classRooms"></param>
         /// <returns></returns>
-        // Done
         public int CountBuilding(List<LichHoc> classRooms) {
             int dem = 0;
             if (classRooms.Any(c => !c.Check && c.PhongHoc.TenPhong.Contains("A8")))
@@ -96,7 +93,6 @@ namespace ChuongTrinhChinh
         /// </summary>
         /// <param name="classRooms"></param>
         /// <returns></returns>
-        // Done
         public List<LichHoc> GetClassRoomsSession(List<LichHoc> classRooms)
         {
             int SoTietConLai = 6 - (int)(SegmentTime / 300);
@@ -107,7 +103,6 @@ namespace ChuongTrinhChinh
         /// Hàm tính SegmentTime bằng cách tính thời gian bắt đầu xử lí của đợt sau
         /// </summary>
         /// <param name="bestBatches"></param>
-        // Done
         public void setTime1(List<BatchScheduler> bestBatches)
         {
             if (bestBatches.Count < 2)
@@ -127,7 +122,6 @@ namespace ChuongTrinhChinh
         /// Hàm tính SegmentTime khi không có lớp nào đang xử lí 
         /// </summary>
         /// <param name="SelectedClasses"></param>
-        // Done
         public void setTime2(List<LichHoc> SelectedClasses)
         {
             if (SegmentTime < 300 && SelectedClasses.All(c => c.Check))
@@ -258,7 +252,6 @@ namespace ChuongTrinhChinh
         /// Tính thời gian tan học cho các lớp mới được thêm vào danh sách
         /// </summary>
         /// <param name="bestBatches"></param>
-        // Done
         public void TinhThoiGianTanHoc(List<BatchScheduler> bestBatches, Entities2 db) {
             foreach (var batch in bestBatches) {
                 {
@@ -273,13 +266,33 @@ namespace ChuongTrinhChinh
                     foreach (var classRooms in batch.classrooms)
                     {
                         classRooms.GioTanHoc = newDismissalTime;
+                        CheckGioTanHoc(classRooms);
                         var dbClass = db.LichHocs.FirstOrDefault(l => l.MaLichHoc == classRooms.MaLichHoc);
                         if (dbClass != null)
-                            dbClass.GioTanHoc = newDismissalTime;
+                            dbClass.GioTanHoc = classRooms.GioTanHoc;
                     }
                 }
             }
             db.SaveChanges();
         }
+        
+        /// <summary>
+        /// Hàm kiểm tra giờ tan học có tan học đúng dự định không
+        /// </summary>
+        /// <param name="classroom"></param>
+        public void CheckGioTanHoc(LichHoc classroom)
+        {
+            TimeSpan GioTanHocDuDinh;
+            if (classroom.TietKetThuc == 6)
+                GioTanHocDuDinh = new TimeSpan(11, 35, 0);
+            else
+                GioTanHocDuDinh = new TimeSpan(17, 10, 0);
+
+            GioTanHocDuDinh = GioTanHocDuDinh.Add(TimeSpan.FromSeconds((6 - classroom.GetSessionCount()) * 300));
+
+            if (classroom != null && classroom.GioTanHoc < GioTanHocDuDinh)
+                classroom.GioTanHoc = GioTanHocDuDinh;
+        }
+        
     }
 }
