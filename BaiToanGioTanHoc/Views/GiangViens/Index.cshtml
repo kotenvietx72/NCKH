@@ -12,13 +12,6 @@
     <title>Index</title>
 </head>
 <body>
-    @if (User.IsInRole("Administrator"))
-    {
-        <p>
-            @Html.ActionLink("Create New", "Create")
-        </p>
-    }
-
     <table class="table">
         <tr>
             <th>
@@ -42,10 +35,10 @@
                 <td>
                     @if (User.IsInRole("Administrator"))
                     {
-                        @Html.ActionLink("Edit", "Edit", new { id = item.MaGiangVien }) @Html.Raw(" | ")
-                        @Html.ActionLink("Delete", "Delete", new { id = item.MaGiangVien }) @Html.Raw(" | ")
+                        @Html.ActionLink("Cập nhật", "Edit", new { id = item.MaGiangVien }) @Html.Raw(" | ")
+                        @Html.ActionLink("Xóa", "Delete", new { id = item.MaGiangVien }) @Html.Raw(" | ")
                     }
-                    @Html.ActionLink("Details", "Details", new { id = item.MaGiangVien })
+                    @Html.ActionLink("Chi tiết", "Details", new { id = item.MaGiangVien })
                 </td>
             </tr>
         }

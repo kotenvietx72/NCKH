@@ -167,7 +167,11 @@ namespace BaiToanGioTanHoc.Controllers
                         transaction.Commit();
 
                         var ListNgayHoc = _context.LichHocs.Select(lh => lh.NgayHoc).Distinct().OrderBy(ngay => ngay).ToList();
-                        Task.Run(() => XuLiLichDaLuong(ListNgayHoc));
+                        foreach (var lh in ListNgayHoc)
+                        {
+                            GenerateDismissalTime(lh, 6);
+                            GenerateDismissalTime(lh, 12);
+                        }
 
                         return Json(new { success = true, message = "Dữ liệu từ Excel đã được cập nhật thành công." });
                     }
@@ -194,45 +198,23 @@ namespace BaiToanGioTanHoc.Controllers
                 return Json(new { success = false, message = "Validation Error", details = errors });
             }
         }
-        private async Task GenerateDismissalTime(DateTime? searchDate, int TietKetThuc)
+        /// <summary>
+        /// Tính thời gian tan học các lớp theo ngày và tiết tan học                 
+        /// </summary>
+        /// <param name="searchDate"></param>
+        /// <param name="TietKetThuc"></param>
+        private void GenerateDismissalTime(DateTime? searchDate, int TietKetThuc)
         {
-            await Task.Run(() =>
-            {
-                using (var context = new Entities2()) // Tạo một instance mới
-                {
-                    var a = context.LichHocs.Include(l => l.LopHocPhan).Include(l => l.PhongHoc).Where(l => l.NgayHoc == searchDate && l.TietKetThuc == TietKetThuc);
+            var a = _context.LichHocs.Include(l => l.LopHocPhan).Include(l => l.PhongHoc)
+                .Where(l => l.NgayHoc == searchDate && l.TietKetThuc == TietKetThuc);
+            List<LichHoc> ClassRooms = a.ToList();
+            foreach (var classroom in ClassRooms)
+                classroom.InjectDbContext(_context);
 
-                    List<LichHoc> ClassRooms = a.ToList();
+            List<BatchScheduler> bestBatches = new List<BatchScheduler>();
+            XuLiDuLieu xuLiDuLieu = new XuLiDuLieu(_context);
 
-                    foreach (var classroom in ClassRooms)
-                        classroom.InjectDbContext(context);
-
-                    List<BatchScheduler> bestBatches = new List<BatchScheduler>();
-                    XuLiDuLieu xuLiDuLieu = new XuLiDuLieu(context);
-
-                    xuLiDuLieu.TimCacDotToiUu(bestBatches, ClassRooms);
-                }
-            });
-        }
-
-        private async Task RunGenerateDismissalTimeAsync(DateTime searchDate)
-        {
-            var task1 = GenerateDismissalTime(searchDate, 6);  // Tiết 6
-            var task2 = GenerateDismissalTime(searchDate, 12); // Tiết 12
-
-            await Task.WhenAll(task1, task2); // Chờ cả 2 task hoàn thành
-        }
-
-        private async void XuLiLichDaLuong(List<DateTime> ListNgayHoc)
-        {
-            var tasks = new List<Task>();
-
-            foreach (var lh in ListNgayHoc)
-            {
-                tasks.Add(RunGenerateDismissalTimeAsync(lh)); // Gọi task xử lý mỗi ngày học
-            }
-
-            await Task.WhenAll(tasks); // Chờ tất cả các task hoàn thành
+            xuLiDuLieu.TimCacDotToiUu(bestBatches, ClassRooms);
         }
     }
 }

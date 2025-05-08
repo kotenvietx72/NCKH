@@ -5,12 +5,28 @@
     {
         @Html.AntiForgeryToken()
 
-        <ul class="navbar-nav navbar-right">
-            <li>
-                @Html.ActionLink("Hello " + User.Identity.GetUserName() + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage", @class = "nav-link" })
-            </li>
-            <li><a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Đăng Xuất</a></li>
-        </ul>
+<ul class="navbar-nav navbar-right">
+    @{
+        string roleDisplay = "";
+        if (User.IsInRole("Administrator"))
+        {
+            roleDisplay = "Admin";
+        }
+        else if (User.IsInRole("Giangvien"))
+        {
+            roleDisplay = "Giảng viên";
+        }
+        else if (User.IsInRole("Sinhvien"))
+        {
+            roleDisplay = "Sinh viên";
+        }
+    }
+
+    <li>
+        @Html.ActionLink("Xin chào " + roleDisplay + "!", "Index", "Manage", routeValues: null, htmlAttributes: new { title = "Manage", @class = "nav-link" })
+    </li>
+    <li><a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Đăng Xuất</a></li>
+</ul>
     }
 }
 else

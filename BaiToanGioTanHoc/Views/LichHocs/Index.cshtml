@@ -13,18 +13,37 @@
     <title>Index</title>
 </head>
 <body>
-    @if (User.IsInRole("Administrator"))
-    {
-        <p>
-            @Html.ActionLink("Create New", "Create")
-        </p>
-    }
     @using (Html.BeginForm("Index", "LichHocs", FormMethod.Get))
     {
-        <label>Chọn ngày học:</label>
-        <input type="date" name="searchDate" class="form-control" value="@Request.QueryString["searchDate"]" />
-        <button type="submit" class="btn btn-primary mt-2">Tìm kiếm</button>
+        <div class="row mb-3">
+            <div class="col-md-3">
+                <label>Chọn ngày học:</label>
+                <input type="date" name="searchDate" class="form-control" value="@Request["searchDate"]" />
+            </div>
+            <div class="col-md-3">
+                <label>Sắp xếp giờ tan học:</label>
+                <select name="sortOrder" class="form-select">
+                    <option value="">Tăng dần</option>
+                    <option value="desc" @(Request["sortOrder"] == "desc" ? "selected" : "")>Giảm dần</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label>Chọn buổi học:</label>
+                <select name="sortBySession" class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="morning" @(Request["sortBySession"] == "morning" ? "selected" : "")>Buổi sáng</option>
+                    <option value="afternoon" @(Request["sortBySession"] == "afternoon" ? "selected" : "")>Buổi chiều</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Lọc</button>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+                <a href="@Url.Action("ExportToExcel", "LichHocs", new { searchDate = Request["searchDate"], sortOrder = Request["sortOrder"], sortBySession = Request["sortBySession"] })" class="btn btn-success">Xuất Excel</a>
+            </div>
+        </div>
     }
+
     <table class="table">
         <tr>
             <th>
@@ -78,10 +97,10 @@
                 <td>
                     @if (User.IsInRole("Administrator"))
                     {
-                        @Html.ActionLink("Edit", "Edit", new { id = item.MaLichHoc }) @Html.Raw(" | ")
-                        @Html.ActionLink("Delete", "Delete", new { id = item.MaLichHoc }) @Html.Raw(" | ")
+                        @Html.ActionLink("Cập nhật", "Edit", new { id = item.MaLichHoc }) @Html.Raw(" | ")
+                        @Html.ActionLink("Xóa", "Delete", new { id = item.MaLichHoc }) @Html.Raw(" | ")
                     }
-                    @Html.ActionLink("Details", "Details", new { id = item.MaLichHoc })
+                    @Html.ActionLink("Chi tiết", "Details", new { id = item.MaLichHoc })
                 </td>
             </tr>
         }

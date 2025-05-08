@@ -152,36 +152,53 @@ namespace ChuongTrinhChinh
         /// <param name="bestBatches"></param>
         /// <param name="classrooms"></param>
         public void TimCacDotToiUu(List<BatchScheduler> bestBatches, List<LichHoc> classrooms) {
-            List<LichHoc> SelectedClasses;                                                                              // Khởi tạo biến lưu các lớp đến giờ được xử lí
-            while (classrooms.Any(c => !c.Check) && SegmentTime <= 1200)                                                // Lặp đến khi xử lí hết các lớp trong danh sách hoặc chưa đến giờ xử lí
-            {                                              
-                double SegmentTimeOld = SegmentTime;                                                                    // Tạo biến SegmentTimeOld trước khi setTime
-                var NhomDangXet = new BatchScheduler(db);                                                                 // Tạo 1 batch lưu nhóm đang xét
-                var NhomDuocChon = new BatchScheduler(db);                                                                // Tạo 1 batch lưu nhóm được chọn
-                
-                SelectedClasses = GetClassRoomsSession(classrooms);                                                     // Lấy danh sách các lớp đến giờ xử lí
+            // Khởi tạo biến lưu các lớp đến giờ được xử lí
+            List<LichHoc> SelectedClasses;
+            // Lặp đến khi xử lí hết các lớp trong danh sách hoặc đã đến giờ tan học
+            while (classrooms.Any(c => !c.Check) && SegmentTime <= 1200)  
+            {
+                // Tạo biến SegmentTimeOld trước khi setTime
+                double SegmentTimeOld = SegmentTime;
+                // Tạo 1 batch lưu nhóm đang xét
+                var NhomDangXet = new BatchScheduler(db);
+                // Tạo 1 batch lưu nhóm được chọn
+                var NhomDuocChon = new BatchScheduler(db);
+
+                // Lấy danh sách các lớp đến giờ xử lí
+                SelectedClasses = GetClassRoomsSession(classrooms);  
+                // Sắp xếp các lớp tăng dần theo thời gian ra khỏi cổng + thời gian xử lí lớp đó
                 SapXep(SelectedClasses);
 
-                NhanhCan(NhomDangXet, 0, NhomDuocChon);                                                                 // Gọi thuật toán nhánh cận, với nhóm mới và bắt đầu từ 0
-                if (NhomDuocChon.classrooms.Count > 0)                                                                  // Nếu có đợt tối ưu, lưu lại
+                // Gọi thuật toán nhánh cận, với nhóm mới và bắt đầu từ vị trí thứ 0
+                NhanhCan(NhomDangXet, 0, NhomDuocChon);
+
+                // Nếu có đợt tối ưu, lưu lại
+                if (NhomDuocChon.classrooms.Count > 0)               
                 {
                     bestBatches.Add(NhomDuocChon.DeepCopy());
+
+                    // Đánh dấu các lớp đã được chọn, không xử lí các lớp này trong các đợt tiếp theo 
                     foreach (var room in NhomDuocChon.classrooms)
-                        classrooms.First(x => x.MaLichHoc == room.MaLichHoc).Check = true;                              // Đánh dấu các lớp đã được chọn, không xử lí các lớp này trong các đợt tiếp theo  
-                    
-                    setTime1(bestBatches);                                                                              // setTime cho SegmentTime
-                    
-                    if (bestBatches.Count > 1 && SegmentTime - bestBatches[bestBatches.Count - 2].TimeCheck > 300)      // Nếu thời gian thực hiện hai đợt cách nhau quá 5 phút, lưu biến TimeCheck của đợt gần nhất bằng SegmentTimeOld
+                        classrooms.First(x => x.MaLichHoc == room.MaLichHoc).Check = true;
+
+                    // Tính SegmentTime
+                    setTime1(bestBatches); 
+
+                    // Nếu thời gian thực hiện hai đợt cách nhau quá 5 phút, lưu biến TimeCheck của đợt gần nhất bằng SegmentTimeOld
+                    if (bestBatches.Count > 1 && SegmentTime - bestBatches[bestBatches.Count - 2].TimeCheck > 300)      
                         bestBatches[bestBatches.Count - 1].TimeCheck = SegmentTimeOld;
                     else
                         bestBatches[bestBatches.Count - 1].TimeCheck = SegmentTime;
-                    continue;                                                                                           // Tính xong TimeCheck thì bỏ qua, tiếp tục lặp lại                                                                                    // Tính xong TimeCheck thì bỏ qua, tiếp tục lặp lại
+                    continue;                                                                                    
                 }
-                setTime2(SelectedClasses);                                                                              // Nếu không lớp đến giờ xử lí, lập tức nhảy đến khoảng thời gian tiếp theo để xử lí tiếp
+
+                // Nếu không lớp đến giờ xử lí, lập tức nhảy đến khoảng thời gian tiếp theo để xử lí tiếp
+                setTime2(SelectedClasses);
 
             }
 
-            if (classrooms.Any(c => !c.Check))                                                                          // Xử lí các lớp chưa được xử lí
+            // Xử lí các lớp chưa được xử lí
+            if (classrooms.Any(c => !c.Check))                                                                          
             {
                 var NhomConLai = new BatchScheduler(db);
                 var roomsToCheck = classrooms.Where(c => !c.Check).ToList();
@@ -193,7 +210,8 @@ namespace ChuongTrinhChinh
                 bestBatches.Last().TimeCheck = 1200;
             }
 
-            TinhThoiGianTanHoc(bestBatches, db);                                                                            // Tính thời gian tan học
+            // Tính thời gian tan học
+            TinhThoiGianTanHoc(bestBatches, db);                                                                           
 
             /// <summary>
             /// Sử dụng nhánh cận để tìm ra nhóm tối ưu
@@ -202,8 +220,12 @@ namespace ChuongTrinhChinh
             /// <param name="index">Vị trí lớp đang xét trong danh sách</param>
             void NhanhCan(BatchScheduler NhomDangXet, int index, BatchScheduler NhomDuocChon)
             {
+                // Biến để tính tổng số lượng sinh viên cần xử lí
                 int totalStudents = CountStudent(SelectedClasses);
+
+                // Biến để tính tổng số lượng sinh viên trong nhóm đang xét 
                 int totalStudentsNhomDangXet = NhomDangXet.Count_Student();
+
                 // Nếu nhóm đang xét có tổng số lượng sinh viên lớn hơn GioiHanMax thì dừng nhánh này
                 if (totalStudentsNhomDangXet > GioiHanMaxSinhVien)
                     return;
@@ -222,10 +244,13 @@ namespace ChuongTrinhChinh
                 }
 
                 // Nếu nhóm đang xét hợp lệ và tốt hơn nhóm hiện tại => lưu lại nhóm tốt hơn
-                if ((totalStudentsNhomDangXet >= GioiHanMinSinhVien && IsValidBatch(NhomDangXet) == 3 && CountBuilding(SelectedClasses) == 3) || (totalStudentsNhomDangXet >= GioiHanMinSinhVien && IsValidBatch(NhomDangXet) == 2 && CountBuilding(SelectedClasses) == 2) || (totalStudentsNhomDangXet >= GioiHanMinSinhVien && IsValidBatch(NhomDangXet) == 1 && CountBuilding(SelectedClasses) == 1))
+                if ((totalStudentsNhomDangXet >= GioiHanMinSinhVien && IsValidBatch(NhomDangXet) == 3 && CountBuilding(SelectedClasses) == 3) 
+                    || (totalStudentsNhomDangXet >= GioiHanMinSinhVien && IsValidBatch(NhomDangXet) == 2 && CountBuilding(SelectedClasses) == 2) 
+                    || (totalStudentsNhomDangXet >= GioiHanMinSinhVien && IsValidBatch(NhomDangXet) == 1 && CountBuilding(SelectedClasses) == 1))
                 {
                     // Nếu NhomDangXet có tỉ lệ thời gian xử lí/ tổng số lớp < đợt hiện tại => Lưu NhomDangXet thay thế bestBatches
-                    if (NhomDuocChon.classrooms.Count == 0 || NhomDangXet.WaitTime() / NhomDangXet.classrooms.Count < NhomDuocChon.WaitTime() / NhomDuocChon.classrooms.Count)
+                    if (NhomDuocChon.classrooms.Count == 0 
+                        || NhomDangXet.WaitTime() / NhomDangXet.classrooms.Count < NhomDuocChon.WaitTime() / NhomDuocChon.classrooms.Count)
                         NhomDuocChon.classrooms = NhomDangXet.DeepCopy().classrooms;
                     // Nếu NhomDangXet có tỉ lệ thời gian xử lí/ tổng số lớp = đợt hiện tại => Xét tiếp thời gian xử lí
                     if (NhomDangXet.WaitTime() / NhomDangXet.classrooms.Count == NhomDuocChon.WaitTime() / NhomDuocChon.classrooms.Count)
@@ -236,13 +261,17 @@ namespace ChuongTrinhChinh
                     return;
                 }
 
-                for (int i = index; i < SelectedClasses.Count; i++)                             // Duyệt qua tất cả các lớp trong danh sách
+                // Duyệt qua tất cả các lớp trong danh sách
+                for (int i = index; i < SelectedClasses.Count; i++)                            
                 {
-                    if (SelectedClasses[i].Check)                                                // Lớp đã được xử lí, bỏ qua
-                        continue;
-                    NhomDangXet.classrooms.Add(SelectedClasses[i]);                             // Thêm nhóm vào lớp
-                    NhanhCan(NhomDangXet, i + 1, NhomDuocChon);                                 // Gọi đệ quy để thử các lớp tiếp theo, chọn các lớp sau để tránh chọn lớp cũ và trùng tổ hợp
-                    NhomDangXet.classrooms.RemoveAt(NhomDangXet.classrooms.Count - 1);          // Quay lui: Bỏ lớp cuối cùng được thêm vào để thử các tổ hợp khác
+                    // Thêm lớp vào nhóm
+                    NhomDangXet.classrooms.Add(SelectedClasses[i]);
+
+                    // Gọi đệ quy để thử các lớp tiếp theo, chọn các lớp sau để tránh chọn lớp cũ và trùng tổ hợp
+                    NhanhCan(NhomDangXet, i + 1, NhomDuocChon);
+
+                    // Quay lui: Bỏ lớp cuối cùng được thêm vào để thử các tổ hợp khác
+                    NhomDangXet.classrooms.RemoveAt(NhomDangXet.classrooms.Count - 1);          
                 }
             }
 
@@ -255,6 +284,7 @@ namespace ChuongTrinhChinh
         public void TinhThoiGianTanHoc(List<BatchScheduler> bestBatches, Entities2 db) {
             foreach (var batch in bestBatches) {
                 {
+                    // Nếu học buổi sáng thời gian tan học sớm nhất 11h35, chiều là 17h10
                     batch.SetGioTanHocBanDau();
                     TimeSpan newDismissalTime;
                     // Đợt nào có thời gian tan học quá 11h55, set tan học lúc 11h55
@@ -266,7 +296,9 @@ namespace ChuongTrinhChinh
                     foreach (var classRooms in batch.classrooms)
                     {
                         classRooms.GioTanHoc = newDismissalTime;
+                        // Kiểm tra thời gian tan học có đúng với yêu cầu ban đầu không
                         CheckGioTanHoc(classRooms);
+                        // Lưu giờ tan học lên cơ sở dữ liệu
                         var dbClass = db.LichHocs.FirstOrDefault(l => l.MaLichHoc == classRooms.MaLichHoc);
                         if (dbClass != null)
                             dbClass.GioTanHoc = classRooms.GioTanHoc;

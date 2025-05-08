@@ -80,7 +80,6 @@ namespace BaiToanGioTanHoc.Models
         /// <summary>
         /// Hàm tính thời gian đi từ lớp tới cổng soát vé 
         /// </summary>
-        // Done
         public double? TimeToGate()
         {
             if (PhongHoc.TenPhong.Substring(2, 2) == "A8")
@@ -178,13 +177,11 @@ namespace BaiToanGioTanHoc.Models
         /// <summary>
         /// Hàm tính thời gian 1 lớp đi ra hết khỏi cổng soát vé 
         /// </summary>
-        // Done
-        public double? ExitTime() => LopHocPhan.SiSo * GetThoiGianXuLiSV() / GetSoCong() * 0.85;
+        public double? ExitTime() => LopHocPhan.SiSo * GetThoiGianXuLiSV() / GetSoCong() * 0.6019;
 
         /// <summary>
         /// Hàm lấy số tiết học của 1 lớp 
         /// </summary>
-        // Done
         public int GetSessionCount() => TietKetThuc - TietBatDau + 1;
 
     }

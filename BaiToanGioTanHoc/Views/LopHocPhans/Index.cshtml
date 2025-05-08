@@ -3,15 +3,6 @@
 @{
     ViewBag.Title = "Index";
 }
-
-<h2>Index</h2>
-
-@if (User.IsInRole("Administrator"))
-{
-    <p>
-        @Html.ActionLink("Create New", "Create")
-    </p>
-}
 @using (Html.BeginForm("Index", "LopHocPhans", FormMethod.Get))
 {
     <label>Nhập mã lớp học phần:</label>
@@ -59,10 +50,10 @@
             <td>
                 @if (User.IsInRole("Administrator"))
                 {
-                    @Html.ActionLink("Edit", "Edit", new { id = item.MaLHP }) @Html.Raw(" | ")
-                    @Html.ActionLink("Delete", "Delete", new { id = item.MaLHP }) @Html.Raw(" | ")
+                    @Html.ActionLink("Cập nhật", "Edit", new { id = item.MaLHP }) @Html.Raw(" | ")
+                    @Html.ActionLink("Xóa", "Delete", new { id = item.MaLHP }) @Html.Raw(" | ")
                 }
-                @Html.ActionLink("Details", "Details", new { id = item.MaLHP })
+                @Html.ActionLink("Chi tiết", "Details", new { id = item.MaLHP })
             </td>
         </tr>
     }

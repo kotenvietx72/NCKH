@@ -4,14 +4,6 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
-
-@if (User.IsInRole("Administrator"))
-{
-    <p>
-        @Html.ActionLink("Create New", "Create")
-    </p>
-}
 <table class="table">
     <tr>
         <th>
@@ -35,10 +27,10 @@
             <td>
                 @if (User.IsInRole("Administrator"))
                 {
-                    @Html.ActionLink("Edit", "Edit", new { id = item.MaMH }) @Html.Raw(" | ")
-                    @Html.ActionLink("Delete", "Delete", new { id = item.MaMH }) @Html.Raw(" | ")
+                    @Html.ActionLink("Cập nhật", "Edit", new { id = item.MaMH }) @Html.Raw(" | ")
+                    @Html.ActionLink("Xóa", "Delete", new { id = item.MaMH }) @Html.Raw(" | ")
                 }
-                @Html.ActionLink("Details", "Details", new { id = item.MaMH })
+                @Html.ActionLink("Chi tiết", "Details", new { id = item.MaMH })
             </td>
         </tr>
     }

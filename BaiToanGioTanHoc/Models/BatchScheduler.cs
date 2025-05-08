@@ -31,7 +31,6 @@ namespace ChuongTrinhChinh
         {
             this.db = db;
         }
-
         public ThoiGianDiChuyen GetThoiGianDiChuyenHA8() => db.ThoiGianDiChuyens.FirstOrDefault(t => t.ToaNha == "HA8");
 
         public ThoiGianDiChuyen GetThoiGianDiChuyenHA9() => db.ThoiGianDiChuyens.FirstOrDefault(t => t.ToaNha == "HA9");
@@ -46,7 +45,6 @@ namespace ChuongTrinhChinh
         /// Hàm sao chép thông tin từ đợt này vào đợt khác        
         /// </summary>
         /// <returns></returns>
-        // Done
         public BatchScheduler DeepCopy()
         {
             return new BatchScheduler(db)
@@ -63,7 +61,6 @@ namespace ChuongTrinhChinh
         /// <param name="room"></param>
         /// <param name="a"></param>
         /// <returns></returns>
-        // Done
         public double? TotalTimeForFirst(int i)
         {
             if (i == 0) 
@@ -74,7 +71,6 @@ namespace ChuongTrinhChinh
         /// <summary>
         /// Hàm tính thời gian trống của a lớp đầu tiên trong đợt (Nếu có) 
         /// </summary>
-        // Done
         public double? TinhTGTrong(int a)
         {
             double ThoiGianTrong = 0;
@@ -95,7 +91,6 @@ namespace ChuongTrinhChinh
         /// <summary>
         /// Hàm tính thời gian xử lí mỗi đợt
         /// </summary> 
-        // Done
         public double? ProcessingTime() {
             classrooms = classrooms.OrderBy(x => x.TimeToGate()).ToList();
             double ThoiGianXuLi = 0;
@@ -109,7 +104,6 @@ namespace ChuongTrinhChinh
         /// </summary>
         /// <param name="classInformation"></param>
         /// <returns></returns>
-        // Done
         public double? WaitTime()
         {
             classrooms = classrooms.OrderBy(x => x.TimeToGate()).ToList();
@@ -136,7 +130,6 @@ namespace ChuongTrinhChinh
         /// </summary>
         /// <param name="classrooms"></param>
         /// <returns></returns>
-        // Done
         public int Count_Student()
         {
             if(classrooms.Count == 0) 

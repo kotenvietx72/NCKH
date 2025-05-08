@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
-using System.Diagnostics;
-using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using BaiToanGioTanHoc.Models;
-using ChuongTrinhChinh;
+using ClosedXML.Excel;
 
 namespace BaiToanGioTanHoc.Controllers
 {
@@ -18,28 +17,116 @@ namespace BaiToanGioTanHoc.Controllers
     {
         private Entities2 db = new Entities2();
 
+
         // GET: LichHocs
-        public ActionResult Index(DateTime? searchDate)
+        public ActionResult Index(DateTime? searchDate, string sortOrder, string sortBySession)
+        {
+            var lichHocs = db.LichHocs
+                .Include(l => l.LopHocPhan)
+                .Include(l => l.PhongHoc)
+                .Where(l => l.TietKetThuc == 6 || l.TietKetThuc == 12); 
+
+            if (searchDate.HasValue)
+            {
+                lichHocs = lichHocs.Where(l => l.NgayHoc == searchDate.Value);
+            }
+
+            // Xếp theo buổi
+            if (sortBySession == "morning")
+            {
+                lichHocs = lichHocs.Where(l => l.TietKetThuc == 6);
+            }
+            else if (sortBySession == "afternoon")
+            {
+                lichHocs = lichHocs.Where(l => l.TietKetThuc == 12);
+            }
+
+            switch (sortOrder)
+            {
+                case "desc":
+                    lichHocs = lichHocs.OrderByDescending(l => l.GioTanHoc);
+                    break;
+                default:
+                    lichHocs = lichHocs.OrderBy(l => l.GioTanHoc);
+                    break;
+            }
+
+            return View(lichHocs.ToList());
+        }
+        public ActionResult ExportToExcel(DateTime? searchDate, string sortOrder, string sortBySession)
         {
             var lichHocs = db.LichHocs.Include(l => l.LopHocPhan).Include(l => l.PhongHoc);
 
             if (searchDate.HasValue)
+            {
                 lichHocs = lichHocs.Where(l => l.NgayHoc == searchDate.Value);
+            }
 
-            //GenerateDismissalTime(searchDate, 6);
-            //GenerateDismissalTime(searchDate, 12);
+            if (sortBySession == "morning")
+            {
+                lichHocs = lichHocs.Where(l => l.TietBatDau >= 1 && l.TietBatDau <= 3); // Buổi sáng
+            }
+            else if (sortBySession == "afternoon")
+            {
+                lichHocs = lichHocs.Where(l => l.TietBatDau >= 4 && l.TietBatDau <= 6); // Buổi chiều
+            }
+            else if (sortBySession == "evening")
+            {
+                lichHocs = lichHocs.Where(l => l.TietBatDau >= 7); // Buổi tối
+            }
 
-            return View(lichHocs.ToList());
+            // Sắp xếp theo giờ kết thúc
+            switch (sortOrder)
+            {
+                case "desc":
+                    lichHocs = lichHocs.OrderByDescending(l => l.GioTanHoc);
+                    break;
+                default:
+                    lichHocs = lichHocs.OrderBy(l => l.GioTanHoc);
+                    break;
+            }
+
+            var data = lichHocs.ToList();
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("LichHoc");
+
+                worksheet.Cell(1, 1).Value = "Mã Lịch Học";
+                worksheet.Cell(1, 2).Value = "Ngày Học";
+                worksheet.Cell(1, 3).Value = "Tiết Bắt Đầu";
+                worksheet.Cell(1, 4).Value = "Tiết Kết Thúc";
+                worksheet.Cell(1, 5).Value = "Giờ Tan Học";
+                worksheet.Cell(1, 6).Value = "Mã Lớp Học Phần";
+                worksheet.Cell(1, 7).Value = "Tên Phòng";
+
+                int row = 2;
+                foreach (var item in data)
+                {
+                    worksheet.Cell(row, 1).Value = item.MaLichHoc;
+                    worksheet.Cell(row, 2).Value = item.NgayHoc.ToString("dd/MM/yyyy");
+                    worksheet.Cell(row, 3).Value = item.TietBatDau;
+                    worksheet.Cell(row, 4).Value = item.TietKetThuc;
+                    worksheet.Cell(row, 5).Value = item.GioTanHoc.HasValue
+                    ? $"{(int)item.GioTanHoc.Value.TotalHours:D2}:{item.GioTanHoc.Value.Minutes:D2}"
+                    : "";
+                    worksheet.Cell(row, 6).Value = item.LopHocPhan.MaLHP;
+                    worksheet.Cell(row, 7).Value = item.PhongHoc.TenPhong;
+                    row++;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    workbook.SaveAs(memoryStream);
+                    memoryStream.Position = 0;
+                    return File(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "LichHoc.xlsx");
+                }
+            }
         }
-        //public ActionResult Index()
-        //{
-        //    GenerateDismissalTime();
-        //    var lichHocs = db.LichHocs.Include(l => l.LopHocPhan).Include(l => l.PhongHoc);
-        //    return View(lichHocs.ToList());
-        //}
 
         // GET: LichHocs/Details/5
-        
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -156,7 +243,5 @@ namespace BaiToanGioTanHoc.Controllers
             }
             base.Dispose(disposing);
         }
-
-        
     }
 }

@@ -4,16 +4,27 @@
 
 <h2 class="text-center">Upload Excel</h2>
 
-<div class="container mt-4">
-    <div class="card shadow-sm p-4">
-        <form action="@Url.Action("UploadExcel", "Excel")" method="post" enctype="multipart/form-data">
-            <div class="mb-3">
-                <input type="file" class="form-control w-200" name="file" required />
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4>Upload Excel File</h4>
+                </div>
+                <div class="card-body">
+                    <form action="@Url.Action("UploadExcel", "Excel")" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Chọn file Excel:</label>
+                            <input type="file" class="form-control" name="file" required />
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Upload</button>
+                    </form>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Upload</button>
-        </form>
+        </div>
     </div>
 </div>
+
 
 <!-- Bootstrap Modal -->
 <div id="messageModal" class="modal fade" tabindex="-1" aria-hidden="true">

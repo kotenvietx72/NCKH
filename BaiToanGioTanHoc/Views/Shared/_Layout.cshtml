@@ -8,9 +8,7 @@
     @Scripts.Render("~/bundles/modernizr")
     <link href="~/Content/css/Menu.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    @{
-        var userGreeting = "Hello " + User.Identity.Name + "!";
-    }
+  
 </head>
 <body>
     <div class="image">
@@ -55,7 +53,7 @@
                             <a class="nav-link text-white" href="@Url.Action("UploadExcel", "Excel")">Cập Nhật Dữ Liệu</a>
                         </li>
                     }
-                </ul>
+                    </ul>
                 <ul class="navbar-nav navbar-right">
                     @Html.Partial("_LoginPartial")
                 </ul>
