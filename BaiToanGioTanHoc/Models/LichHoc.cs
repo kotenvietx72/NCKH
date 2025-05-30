@@ -39,6 +39,12 @@ namespace BaiToanGioTanHoc.Models
         public bool Check {  get; set; }
         [Display(Name = "Giờ Tan Học")]
         public Nullable<System.TimeSpan> GioTanHoc { get; set; }
+
+        [Display(Name = "Thời gian ở cổng soát vé")]
+        public TimeSpan? ThoiGianXuongToiCong {  get; set; }
+
+        [Display(Name = "Thời gian qua cổng soát vé")]
+        public TimeSpan? ThoiGianQuaCongSoatVe { get; set; }
         public virtual LopHocPhan LopHocPhan { get; set; }
         public virtual PhongHoc PhongHoc { get; set; }
 

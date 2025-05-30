@@ -8,7 +8,10 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using BaiToanGioTanHoc.Models;
+using ChuongTrinhChinh;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using PagedList;
 
 namespace BaiToanGioTanHoc.Controllers
 {
@@ -19,39 +22,49 @@ namespace BaiToanGioTanHoc.Controllers
 
 
         // GET: LichHocs
-        public ActionResult Index(DateTime? searchDate, string sortOrder, string sortBySession)
+        public ActionResult Index(DateTime? searchDate, string sortOrder, string sortBySession, int page = 1)
         {
-            var lichHocs = db.LichHocs
+            var list = db.LichHocs
                 .Include(l => l.LopHocPhan)
                 .Include(l => l.PhongHoc)
-                .Where(l => l.TietKetThuc == 6 || l.TietKetThuc == 12); 
+                .Where(l => l.TietKetThuc == 6 || l.TietKetThuc == 12).ToList(); 
+
+            foreach(var classroom in list)
+            {
+                XuLiDuLieu a = new XuLiDuLieu(db);
+                a.TinhTGXuongCSV(classroom);
+                a.TGQuaCSV(classroom);
+            } 
+            
 
             if (searchDate.HasValue)
             {
-                lichHocs = lichHocs.Where(l => l.NgayHoc == searchDate.Value);
+                list = list.Where(l => l.NgayHoc == searchDate.Value).ToList();
             }
 
             // Xếp theo buổi
             if (sortBySession == "morning")
             {
-                lichHocs = lichHocs.Where(l => l.TietKetThuc == 6);
+                list = list.Where(l => l.TietKetThuc == 6).ToList(); // Buổi sáng
             }
             else if (sortBySession == "afternoon")
             {
-                lichHocs = lichHocs.Where(l => l.TietKetThuc == 12);
+                list = list.Where(l => l.TietKetThuc == 12).ToList(); // Buổi chiều
             }
-
             switch (sortOrder)
             {
                 case "desc":
-                    lichHocs = lichHocs.OrderByDescending(l => l.GioTanHoc);
+                    list = list.OrderByDescending(l => l.GioTanHoc).ThenByDescending(l => l.ThoiGianXuongToiCong).ToList(); 
                     break;
                 default:
-                    lichHocs = lichHocs.OrderBy(l => l.GioTanHoc);
+                    list = list.OrderBy(l => l.GioTanHoc).ThenBy(l => l.ThoiGianXuongToiCong).ToList();
                     break;
             }
 
-            return View(lichHocs.ToList());
+            int pageSize = 25;
+            int pageNumber = page;
+
+            return View(list.ToPagedList(pageNumber, pageSize));
         }
         public ActionResult ExportToExcel(DateTime? searchDate, string sortOrder, string sortBySession)
         {
@@ -62,17 +75,14 @@ namespace BaiToanGioTanHoc.Controllers
                 lichHocs = lichHocs.Where(l => l.NgayHoc == searchDate.Value);
             }
 
+            // Xếp theo buổi
             if (sortBySession == "morning")
             {
-                lichHocs = lichHocs.Where(l => l.TietBatDau >= 1 && l.TietBatDau <= 3); // Buổi sáng
+                lichHocs = lichHocs.Where(l => l.TietKetThuc <= 6); // Buổi sáng
             }
             else if (sortBySession == "afternoon")
             {
-                lichHocs = lichHocs.Where(l => l.TietBatDau >= 4 && l.TietBatDau <= 6); // Buổi chiều
-            }
-            else if (sortBySession == "evening")
-            {
-                lichHocs = lichHocs.Where(l => l.TietBatDau >= 7); // Buổi tối
+                lichHocs = lichHocs.Where(l => l.TietKetThuc <= 12); // Buổi chiều
             }
 
             // Sắp xếp theo giờ kết thúc
@@ -92,38 +102,46 @@ namespace BaiToanGioTanHoc.Controllers
             {
                 var worksheet = workbook.Worksheets.Add("LichHoc");
 
-                worksheet.Cell(1, 1).Value = "Mã Lịch Học";
-                worksheet.Cell(1, 2).Value = "Ngày Học";
-                worksheet.Cell(1, 3).Value = "Tiết Bắt Đầu";
-                worksheet.Cell(1, 4).Value = "Tiết Kết Thúc";
-                worksheet.Cell(1, 5).Value = "Giờ Tan Học";
-                worksheet.Cell(1, 6).Value = "Mã Lớp Học Phần";
-                worksheet.Cell(1, 7).Value = "Tên Phòng";
+                worksheet.Cell(1, 1).Value = "Mã Lớp Học Phần";
+                worksheet.Cell(1, 2).Value = "Tên Môn Học";
+                worksheet.Cell(1, 3).Value = "Tên Lớp Danh Nghĩa";
+                worksheet.Cell(1, 4).Value = "Sĩ Số";
+                worksheet.Cell(1, 5).Value = "Ngày Học";
+                worksheet.Cell(1, 6).Value = "Tiết Bắt Đầu";
+                worksheet.Cell(1, 7).Value = "Tiết Kết Thúc";
+                worksheet.Cell(1, 8).Value = "Giờ Tan Học";
+                worksheet.Cell(1, 9).Value = "Tên Phòng";
+                worksheet.Cell(1, 10).Value = "Tên Giảng Viên";
 
                 int row = 2;
                 foreach (var item in data)
                 {
-                    worksheet.Cell(row, 1).Value = item.MaLichHoc;
-                    worksheet.Cell(row, 2).Value = item.NgayHoc.ToString("dd/MM/yyyy");
-                    worksheet.Cell(row, 3).Value = item.TietBatDau;
-                    worksheet.Cell(row, 4).Value = item.TietKetThuc;
-                    worksheet.Cell(row, 5).Value = item.GioTanHoc.HasValue
+                    worksheet.Cell(row, 1).Value = item.MaLHP;
+                    worksheet.Cell(row, 2).Value = item.LopHocPhan.MonHoc.TenMH;
+                    worksheet.Cell(row, 3).Value = item.LopHocPhan.LopDanhNghia.TenLopDN;
+                    worksheet.Cell(row, 4).Value = item.LopHocPhan.SiSo;
+                    worksheet.Cell(row, 5).Value = item.NgayHoc.ToString("dd/MM/yyyy");
+                    worksheet.Cell(row, 6).Value = item.TietBatDau;
+                    worksheet.Cell(row, 7).Value = item.TietKetThuc;
+                    worksheet.Cell(row, 8).Value = item.GioTanHoc.HasValue
                     ? $"{(int)item.GioTanHoc.Value.TotalHours:D2}:{item.GioTanHoc.Value.Minutes:D2}"
                     : "";
-                    worksheet.Cell(row, 6).Value = item.LopHocPhan.MaLHP;
-                    worksheet.Cell(row, 7).Value = item.PhongHoc.TenPhong;
+                    worksheet.Cell(row, 9).Value = item.PhongHoc.TenPhong;
+                    worksheet.Cell(row, 10).Value = item.LopHocPhan.GiangVien.HoTenGiangVien;
                     row++;
                 }
 
                 worksheet.Columns().AdjustToContents();
 
-                using (var memoryStream = new MemoryStream())
-                {
-                    workbook.SaveAs(memoryStream);
-                    memoryStream.Position = 0;
-                    return File(memoryStream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "LichHoc.xlsx");
-                }
+                var memoryStream = new MemoryStream();
+                workbook.SaveAs(memoryStream);
+                memoryStream.Position = 0;
+
+                return File(memoryStream,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "LichHoc.xlsx");
             }
+        
         }
 
         // GET: LichHocs/Details/5

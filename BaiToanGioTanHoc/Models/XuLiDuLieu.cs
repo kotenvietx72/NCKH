@@ -325,6 +325,28 @@ namespace ChuongTrinhChinh
             if (classroom != null && classroom.GioTanHoc < GioTanHocDuDinh)
                 classroom.GioTanHoc = GioTanHocDuDinh;
         }
-        
+
+        public void TinhTGXuongCSV(LichHoc classroom)
+        {
+            // đảm bảo classroom đã có context để TimeToGate() hoạt động
+            classroom.InjectDbContext(db);
+
+            var dbClass = db.LichHocs.FirstOrDefault(l => l.MaLichHoc == classroom.MaLichHoc);
+            if (dbClass == null) return;
+
+            // giờ thì TimeToGate() sẽ không null
+            var travelSeconds = classroom.TimeToGate() ?? 0;
+            classroom.ThoiGianXuongToiCong = dbClass.GioTanHoc + TimeSpan.FromSeconds(travelSeconds);
+        }
+
+        public void TGQuaCSV(LichHoc classroom)
+        {
+            classroom.InjectDbContext(db);
+
+            var ExitSeconds = classroom.ExitTime() ?? 0;
+            classroom.ThoiGianQuaCongSoatVe = classroom.ThoiGianXuongToiCong + TimeSpan.FromSeconds(ExitSeconds);
+        }
+
+
     }
 }

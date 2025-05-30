@@ -1,5 +1,6 @@
-﻿@model IEnumerable<BaiToanGioTanHoc.Models.LichHoc>
-
+﻿@model IPagedList<BaiToanGioTanHoc.Models.LichHoc>
+@using PagedList.Mvc;
+@using PagedList;
 
 @{
     ViewBag.Title = "Index";
@@ -11,6 +12,78 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
+    <style>
+        table {
+            width: 100%;
+            margin-top: 20px;
+            table-layout: fixed;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .fixed-table {
+            min-width: 2000px;
+            table-layout: fixed;
+        }
+
+            .fixed-table th, .fixed-table td {
+                white-space: normal;
+                word-break: break-word;
+            }
+
+        th:nth-child(2), td:nth-child(2) {
+            width: 200px;
+            word-wrap: break-word;
+        }
+
+        .pagination {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+            .pagination a {
+                padding: 8px 12px;
+                margin: 0 4px;
+                border: 1px solid #007bff;
+                color: #007bff;
+                text-decoration: none;
+            }
+
+            .pagination a.active {
+                background-color: #007bff;
+                color: white;
+            }
+
+            .pagination a:hover {
+                background-color: #0056b3;
+                color: white;
+            }
+        th:nth-child(2), td:nth-child(2) { 
+            width: 150px;
+        }
+
+        th:nth-child(3), td:nth-child(3) { 
+            width: 100px;
+        }
+
+        th:nth-child(4), td:nth-child(3) { 
+            width: 120px;
+        }
+
+        th:nth-child(5), td:nth-child(5) { 
+            width: 120px;
+        }
+
+        th:nth-child(6), td:nth-child(6) { 
+            width: 120px;
+        }
+    </style>
+
 </head>
 <body>
     @using (Html.BeginForm("Index", "LichHocs", FormMethod.Get))
@@ -33,78 +106,108 @@
                     <option value="">Tất cả</option>
                     <option value="morning" @(Request["sortBySession"] == "morning" ? "selected" : "")>Buổi sáng</option>
                     <option value="afternoon" @(Request["sortBySession"] == "afternoon" ? "selected" : "")>Buổi chiều</option>
+
                 </select>
             </div>
             <div class="col-md-3 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary">Lọc</button>
             </div>
+
             <div class="col-md-3 d-flex align-items-end">
                 <a href="@Url.Action("ExportToExcel", "LichHocs", new { searchDate = Request["searchDate"], sortOrder = Request["sortOrder"], sortBySession = Request["sortBySession"] })" class="btn btn-success">Xuất Excel</a>
             </div>
         </div>
     }
-
-    <table class="table">
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.MaLichHoc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.NgayHoc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TietBatDau)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TietKetThuc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.GioTanHoc)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LopHocPhan.MaLHP)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PhongHoc.TenPhong)
-            </th>
-            <th></th>
-        </tr>
-
-        @foreach (var item in Model)
-        {
+    <div style="overflow-x: auto;">
+        <table class="table fixed-table">
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.MaLichHoc)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.NgayHoc)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TietBatDau)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TietKetThuc)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.GioTanHoc)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.LopHocPhan.MaLHP)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.PhongHoc.TenPhong)
-                </td>
-                <td>
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        @Html.ActionLink("Cập nhật", "Edit", new { id = item.MaLichHoc }) @Html.Raw(" | ")
-                        @Html.ActionLink("Xóa", "Delete", new { id = item.MaLichHoc }) @Html.Raw(" | ")
-                    }
-                    @Html.ActionLink("Chi tiết", "Details", new { id = item.MaLichHoc })
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().LopHocPhan.MonHoc.TenMH)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().LopHocPhan.SiSo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().NgayHoc)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().TietBatDau)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().TietKetThuc)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().GioTanHoc)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().ThoiGianXuongToiCong)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().ThoiGianQuaCongSoatVe)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().PhongHoc.TenPhong)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.First().LopHocPhan.GiangVien.HoTenGiangVien)
+                </th>
             </tr>
-        }
 
-    </table>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LopHocPhan.MonHoc.TenMH)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LopHocPhan.SiSo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.NgayHoc)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TietBatDau)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TietKetThuc)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GioTanHoc)
+                    </td>
+                    <td>
+                        @(item.ThoiGianXuongToiCong?.ToString(@"hh\:mm\:ss"))
+                    </td>
+                    <td>
+                        @(item.ThoiGianQuaCongSoatVe?.ToString(@"hh\:mm\:ss"))
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhongHoc.TenPhong)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LopHocPhan.GiangVien.HoTenGiangVien)
+                    </td>
+                    <td>
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            @Html.ActionLink("Cập nhật", "Edit", new { id = item.MaLichHoc }) @Html.Raw(" | ")
+                            @Html.ActionLink("Xóa", "Delete", new { id = item.MaLichHoc }) @Html.Raw(" | ")
+                        }
+                        @Html.ActionLink("Chi tiết", "Details", new { id = item.MaLichHoc })
+                    </td>
+                </tr>
+            }
+
+
+        </table>
+    </div>
+    <div class="pagination">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            page,
+            searchDate = Request["searchDate"],
+            sortOrder = Request["sortOrder"],
+            sortBySession = Request["sortBySession"]
+        }))
+    </div>
 </body>
 </html>
